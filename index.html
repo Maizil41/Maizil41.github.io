@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <script src="js/qrcode.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
         #reader {
-            width: 300px;
-            margin: auto;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
@@ -25,8 +25,11 @@
             // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
-            // Redirect ke URL yang dibentuk
-            window.location.href = redirectUrl;
+            // Tampilkan hasil pemindaian tanpa redirect halaman utama
+            document.getElementById('result').innerText = `Hasil QR Code: ${decodedText}`;
+            
+            // Jika Anda ingin membuka URL di dalam iframe atau halaman popup di dalam halaman yang sama
+            // Misalnya, Anda bisa mengirimkan pesan ke halaman utama menggunakan postMessage jika diperlukan.
         }
 
         function onScanFailure(error) {
@@ -44,34 +47,7 @@
             false
         );
 
-        // Mencoba memilih kamera belakang jika tersedia
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure)
-            .then(() => {
-                // Mengambil daftar kamera
-                Html5Qrcode.getCameras()
-                    .then(cameras => {
-                        if (cameras && cameras.length > 1) {
-                            // Mencoba memilih kamera belakang (biasanya indeks 1)
-                            html5QrcodeScanner.getCameras()
-                                .then(cameras => {
-                                    if (cameras && cameras.length > 1) {
-                                        // Mengatur kamera belakang sebagai default
-                                        html5QrcodeScanner.start(
-                                            { facingMode: { exact: "environment" } }, // Kamera belakang
-                                            { fps: 10, qrbox: 250 },
-                                            onScanSuccess,
-                                            onScanFailure
-                                        );
-                                    } else {
-                                        console.error("Kamera belakang tidak ditemukan.");
-                                    }
-                                })
-                                .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
-                        }
-                    })
-                    .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
-            })
-            .catch(err => console.error("Gagal memulai scanner: ", err));
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
 </body>
 </html>
