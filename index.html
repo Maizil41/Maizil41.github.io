@@ -18,13 +18,11 @@
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-            // Asumsi hasil pemindaian adalah username
+
             const username = decodedText;
 
-            // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
-            // Redirect ke URL yang dibentuk
             window.location.href = redirectUrl;
         }
 
