@@ -13,23 +13,27 @@
     </style>
 </head>
 <body>
-    <h1><cnter>Scan QR Code</h1>
+    <h1>Scan QR Code</h1>
     <div id="reader"></div>
-      
+    <p id="result">Hasil QR Code akan muncul di sini</p>
+
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-
+            // Asumsi hasil pemindaian adalah username
             const username = decodedText;
 
+            // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
-            window.location.href = redirectUrl;
+            // Redirect ke URL yang dibentuk dalam popup
+            window.open(redirectUrl, '_blank'); // Membuka redirect URL dalam tab baru
         }
 
         function onScanFailure(error) {
             console.warn(`Kode gagal dipindai: ${error}`);
         }
 
+        // Inisialisasi scanner QR code
         const html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
             { 
@@ -40,33 +44,7 @@
             false
         );
 
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure)
-            .then(() => {
-
-                Html5Qrcode.getCameras()
-                    .then(cameras => {
-                        if (cameras && cameras.length > 1) {
-
-                            html5QrcodeScanner.getCameras()
-                                .then(cameras => {
-                                    if (cameras && cameras.length > 1) {
-
-                                        html5QrcodeScanner.start(
-                                            { facingMode: { exact: "environment" } }, 
-                                            { fps: 10, qrbox: 250 },
-                                            onScanSuccess,
-                                            onScanFailure
-                                        );
-                                    } else {
-                                        console.error("Kamera belakang tidak ditemukan.");
-                                    }
-                                })
-                                .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
-                        }
-                    })
-                    .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
-            })
-            .catch(err => console.error("Gagal memulai scanner: ", err));
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
 </body>
 </html>
