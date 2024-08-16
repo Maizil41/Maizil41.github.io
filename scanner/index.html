@@ -13,16 +13,23 @@
     </style>
 </head>
 <body>
-    <h1><center>Scan QR Code</h1>
+    <h1><center>Scan QR Code</center></h1>
     <div id="reader"></div>
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-            
-            const username = decodedText;
+            // Cek jika sudah melakukan redirect sebelumnya
+            if (sessionStorage.getItem('redirected') === 'true') {
+                return; // Tidak melakukan apa-apa jika sudah redirect
+            }
 
+            const username = decodedText;
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
+            // Tandai bahwa redirect sudah dilakukan
+            sessionStorage.setItem('redirected', 'true');
+
+            // Redirect ke URL
             window.location.href = redirectUrl;
         }
 
