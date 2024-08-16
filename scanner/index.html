@@ -37,7 +37,7 @@
             console.warn(`Kode gagal dipindai: ${error}`);
         }
 
-        const config = { fps: 10, qrbox: 250 };
+        const config = { fps: 60, qrbox: 250 };
         const html5QrcodeScanner = new Html5QrcodeScanner("reader", config, false);
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     </script>
