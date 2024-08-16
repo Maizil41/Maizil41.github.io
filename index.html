@@ -3,8 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1><center>Hello World!</h1>
+    <h1><center>Scan QR Code</h1>
+    <div id="reader"></div>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Asumsi hasil pemindaian adalah username
+            const username = decodedText;
+
+            // Buat URL dengan parameter dinamis
+            const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
+
+            // Redirect ke URL yang dibentuk
+            window.location.href = redirectUrl;
+        }
+
+        function onScanFailure(error) {
+            console.warn(`Kode gagal dipindai: ${error}`);
+        }
+
+        const config = { fps: 10, qrbox: 250 };
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", config, false);
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
 </body>
 </html>
