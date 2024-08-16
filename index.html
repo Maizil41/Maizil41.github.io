@@ -18,11 +18,13 @@
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-
+            // Asumsi hasil pemindaian adalah username
             const username = decodedText;
 
+            // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
+            // Redirect ke URL yang dibentuk
             window.location.href = redirectUrl;
         }
 
@@ -30,9 +32,45 @@
             console.warn(`Kode gagal dipindai: ${error}`);
         }
 
-        const config = { fps: 10, qrbox: 250 };
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", config, false);
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        // Inisialisasi scanner QR code
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", 
+            { 
+                fps: 10, 
+                qrbox: 250, 
+                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+            },
+            false
+        );
+
+        // Mencoba memilih kamera belakang jika tersedia
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure)
+            .then(() => {
+                // Mengambil daftar kamera
+                Html5Qrcode.getCameras()
+                    .then(cameras => {
+                        if (cameras && cameras.length > 1) {
+                            // Mencoba memilih kamera belakang (biasanya indeks 1)
+                            html5QrcodeScanner.getCameras()
+                                .then(cameras => {
+                                    if (cameras && cameras.length > 1) {
+                                        // Mengatur kamera belakang sebagai default
+                                        html5QrcodeScanner.start(
+                                            { facingMode: { exact: "environment" } }, // Kamera belakang
+                                            { fps: 10, qrbox: 250 },
+                                            onScanSuccess,
+                                            onScanFailure
+                                        );
+                                    } else {
+                                        console.error("Kamera belakang tidak ditemukan.");
+                                    }
+                                })
+                                .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
+                        }
+                    })
+                    .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
+            })
+            .catch(err => console.error("Gagal memulai scanner: ", err));
     </script>
 </body>
 </html>
