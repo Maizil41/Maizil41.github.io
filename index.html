@@ -6,9 +6,18 @@
     <title>QR Code Scanner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
         #reader {
             width: 100%;
-            height: 100%;
+            max-width: 600px;
+            height: auto;
         }
     </style>
 </head>
@@ -19,35 +28,37 @@
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-            // Asumsi hasil pemindaian adalah username
             const username = decodedText;
-
-            // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
-
-            // Tampilkan hasil pemindaian tanpa redirect halaman utama
             document.getElementById('result').innerText = `Hasil QR Code: ${decodedText}`;
-            
-            // Jika Anda ingin membuka URL di dalam iframe atau halaman popup di dalam halaman yang sama
-            // Misalnya, Anda bisa mengirimkan pesan ke halaman utama menggunakan postMessage jika diperlukan.
+            // Optional: membuka URL di tab baru
+            // window.open(redirectUrl, '_blank');
         }
 
         function onScanFailure(error) {
             console.warn(`Kode gagal dipindai: ${error}`);
         }
 
-        // Inisialisasi scanner QR code
-        const html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", 
-            { 
-                fps: 10, 
-                qrbox: 250, 
-                supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-            },
-            false
-        );
-
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        Html5Qrcode.getCameras()
+            .then(cameras => {
+                if (cameras && cameras.length > 0) {
+                    const html5QrcodeScanner = new Html5QrcodeScanner(
+                        "reader", 
+                        { 
+                            fps: 10, 
+                            qrbox: 250, 
+                            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                        },
+                        false
+                    );
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                } else {
+                    console.error("Tidak ada kamera ditemukan.");
+                }
+            })
+            .catch(err => {
+                console.error("Gagal mendapatkan daftar kamera:", err);
+            });
     </script>
 </body>
 </html>
