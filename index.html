@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <script src="js/qrcode.js"></script>
+    <script src="js/qrcodejs"></script>
     <style>
         #reader {
             width: 300px;
@@ -13,18 +13,16 @@
     </style>
 </head>
 <body>
-    <h1><center>Scan QR Code</h1>
+    <h1><cnter>Scan QR Code</h1>
     <div id="reader"></div>
-
+      
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-            // Asumsi hasil pemindaian adalah username
+
             const username = decodedText;
 
-            // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
-            // Redirect ke URL yang dibentuk
             window.location.href = redirectUrl;
         }
 
@@ -32,7 +30,6 @@
             console.warn(`Kode gagal dipindai: ${error}`);
         }
 
-        // Inisialisasi scanner QR code
         const html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", 
             { 
@@ -43,20 +40,19 @@
             false
         );
 
-        // Mencoba memilih kamera belakang jika tersedia
         html5QrcodeScanner.render(onScanSuccess, onScanFailure)
             .then(() => {
-                // Mengambil daftar kamera
+
                 Html5Qrcode.getCameras()
                     .then(cameras => {
                         if (cameras && cameras.length > 1) {
-                            // Mencoba memilih kamera belakang (biasanya indeks 1)
+
                             html5QrcodeScanner.getCameras()
                                 .then(cameras => {
                                     if (cameras && cameras.length > 1) {
-                                        // Mengatur kamera belakang sebagai default
+
                                         html5QrcodeScanner.start(
-                                            { facingMode: { exact: "environment" } }, // Kamera belakang
+                                            { facingMode: { exact: "environment" } }, 
                                             { fps: 10, qrbox: 250 },
                                             onScanSuccess,
                                             onScanFailure
