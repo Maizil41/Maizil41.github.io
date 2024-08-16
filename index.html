@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
-    <script src="js/qrcodejs"></script>
+    <script src="js/qrcode.js"></script>
     <style>
         #reader {
             width: 300px;
@@ -25,8 +25,8 @@
             // Buat URL dengan parameter dinamis
             const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
 
-            // Redirect ke URL yang dibentuk dalam popup
-            window.open(redirectUrl, '_blank'); // Membuka redirect URL dalam tab baru
+            // Redirect ke URL yang dibentuk
+            window.location.href = redirectUrl;
         }
 
         function onScanFailure(error) {
@@ -44,7 +44,34 @@
             false
         );
 
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        // Mencoba memilih kamera belakang jika tersedia
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure)
+            .then(() => {
+                // Mengambil daftar kamera
+                Html5Qrcode.getCameras()
+                    .then(cameras => {
+                        if (cameras && cameras.length > 1) {
+                            // Mencoba memilih kamera belakang (biasanya indeks 1)
+                            html5QrcodeScanner.getCameras()
+                                .then(cameras => {
+                                    if (cameras && cameras.length > 1) {
+                                        // Mengatur kamera belakang sebagai default
+                                        html5QrcodeScanner.start(
+                                            { facingMode: { exact: "environment" } }, // Kamera belakang
+                                            { fps: 10, qrbox: 250 },
+                                            onScanSuccess,
+                                            onScanFailure
+                                        );
+                                    } else {
+                                        console.error("Kamera belakang tidak ditemukan.");
+                                    }
+                                })
+                                .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
+                        }
+                    })
+                    .catch(err => console.error("Gagal mendapatkan daftar kamera: ", err));
+            })
+            .catch(err => console.error("Gagal memulai scanner: ", err));
     </script>
 </body>
 </html>
