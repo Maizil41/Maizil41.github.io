@@ -19,11 +19,15 @@
     <script>
         function onScanSuccess(decodedText, decodedResult) {
 
-            const username = decodedText;
-
-            const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
-
-            window.location.href = redirectUrl;
+            if (decodedText.startsWith("http://") || decodedText.startsWith("https://")) {
+                // If the scanned text is a URL, redirect to the URL
+                window.location.href = decodedText;
+            } else {
+                // If it's not a URL, assume it's a username and redirect accordingly
+                const username = decodedText;
+                const redirectUrl = `http://10.10.10.1:3990/login?username=${encodeURIComponent(username)}&password=Accept`;
+                window.location.href = redirectUrl;
+            }
         }
 
         function onScanFailure(error) {
